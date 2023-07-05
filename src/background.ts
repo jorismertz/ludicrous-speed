@@ -1,6 +1,9 @@
-chrome.tabs.onUpdated.addListener(function (tab) {
-  //   chrome.tabs.executeScript(tab.ib, {
-  //     file: "inject.js",
-  //   })
-  console.log("reloaded");
+chrome.tabs.onUpdated.addListener(function (tabID, info, tab) {
+  const isDashboard = tab.url === "https://nettenshop.webshopapp.com/admin/";
+
+  if (isDashboard)
+    chrome.scripting.executeScript({
+      target: { tabId: tabID, allFrames: true },
+      files: ["dashboard.js"],
+    });
 });

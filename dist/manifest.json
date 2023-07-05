@@ -2,11 +2,10 @@
   "name": "darkspeed",
   "version": "1.0",
   "manifest_version": 3,
-  "content_scripts": [
-    {
-      "matches": ["*://nettenshop.webshopapp.com/admin/"],
-      "js": ["dashboard.js"]
-    }
-  ],
+  "permissions": ["scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+
   "host_permissions": ["<all_urls>"]
 }
