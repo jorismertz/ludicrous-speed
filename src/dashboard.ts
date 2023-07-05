@@ -1,7 +1,34 @@
+type CSS = Partial<CSSStyleDeclaration>;
+
+// Voor elke status ff een mooie item maken met een simpel tabbeltje erin van de orders.
+// Ook hyperlinkjes naar de orders zelf.
+// title kan doorsturen naar de filter status zelf.
+
+//https://nettenshop.webshopapp.com/admin/orders?custom_status=manco-bestelling-van-dijk
+//https://nettenshop.webshopapp.com/admin/orders?custom_status=spoedbestelling-jvd
+//https://nettenshop.webshopapp.com/admin/orders?custom_status=besteld-bij-van-jvd-speciale-bestelling
+//https://nettenshop.webshopapp.com/admin/orders?custom_status=rechtstreeks-vanuit-fabriek-verzenden
+
 function init() {
+  async function getFilteredOrdersByCustomStatus(status: string) {
+    const url =
+      "https://nettenshop.webshopapp.com/admin/orders?custom_status=" + status;
+
+    const response = await fetch(url);
+    const html = await response.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const table = doc.querySelector(
+      "#table_orders > div > div > table > tbody"
+    );
+
+    return table?.innerHTML;
+  }
+
   const $ = (el: string) => document.querySelectorAll(el);
 
-  type CSS = Partial<CSSStyleDeclaration>;
   const addStyles = (styles: CSS, el: HTMLElement) => {
     for (const key in styles) {
       el.style[key] = styles[key] as string;
@@ -48,28 +75,51 @@ function init() {
     }
   } catch (e) {}
 
+  const warning = $("#content > div:nth-child(2) > div.alert.wide.warning.top");
+  warning[0].remove();
+
   // Create new item wrapper
 
   const item_wrapper = document.createElement("div");
   addStyles(item_wrapper_styles, item_wrapper);
   dashboard_items.appendChild(item_wrapper);
 
-  // Test item
+  const statusses = [
+    "manco-bestelling-van-dijk",
+    "spoedbestelling-jvd",
+    "besteld-bij-van-jvd-speciale-bestelling",
+    "rechtstreeks-vanuit-fabriek-verzenden",
+  ];
 
-  const test_item = document.createElement("div");
-  test_item.innerText = "Test Item";
-  addStyles({ ...item_styles, gridColumn: "span 2" }, test_item);
-  item_wrapper.appendChild(test_item);
+  const items_to_add: HTMLDivElement[] = [];
 
-  const test_item2 = document.createElement("div");
-  addStyles(item_styles, test_item2);
-  item_wrapper.appendChild(test_item2);
+  for (const status of statusses) {
+    getFilteredOrdersByCustomStatus(status).then((res) => {
+      const item = document.createElement("div");
+      addStyles(item_styles, item);
+      item.innerHTML = res || "null";
+      item_wrapper.appendChild(item);
+      items_to_add.push(item);
 
-  const cat = document.createElement("img");
-  cat.src =
-    "https://thumbs.gfycat.com/DeficientYellowishKilldeer-size_restricted.gif";
-  cat.style.margin = "0 auto";
-  test_item2.appendChild(cat);
+      // test_item.innerHTML = `
+      //   <h2>Manco orders</h2>
+      //   <p>${amount}</p>
+      // `;
+    });
+  }
+
+  items_to_add.sort((a, b) => {
+    // if innerHTML is "null" then put it at the end of the array
+    if (a.innerHTML === "null") return 1;
+    if (b.innerHTML === "null") return -1;
+    return 0;
+  });
+
+  for (const item of items_to_add) {
+    item_wrapper.appendChild(item);
+  }
+
+  console.log(items_to_add);
 }
 
 (() => {
