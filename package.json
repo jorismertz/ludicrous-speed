@@ -1,0 +1,19 @@
+{
+  "name": "darkspeed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "./build.sh",
+    "dev": "npx tsc-watch --onSuccess \"cp manifest.json dist/\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "^0.0.239",
+    "@types/node": "^20.3.3",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.1.6"
+  }
+}
