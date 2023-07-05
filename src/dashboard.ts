@@ -1,9 +1,5 @@
 type CSS = Partial<CSSStyleDeclaration>;
 
-// Voor elke status ff een mooie item maken met een simpel tabbeltje erin van de orders.
-// Ook hyperlinkjes naar de orders zelf.
-// title kan doorsturen naar de filter status zelf.
-
 function addStyles(styles: CSS, el: HTMLElement) {
   for (const key in styles) {
     el.style[key] = styles[key] as string;
