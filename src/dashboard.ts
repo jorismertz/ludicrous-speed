@@ -26,8 +26,10 @@ function init() {
 
   const dashboard_items = $(".container")[2];
 
-  const has_already_run = dashboard_items.querySelector("has-run");
-  if (has_already_run) return;
+  try {
+    const has_already_run = dashboard_items.querySelector("has-run");
+    if (has_already_run) return;
+  } catch (e) {}
 
   const rerun_preventer = document.createElement("has-run");
   dashboard_items.appendChild(rerun_preventer);
