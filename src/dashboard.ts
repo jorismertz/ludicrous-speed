@@ -80,6 +80,10 @@ function init() {
       justify-content: space-between;
     }
 
+    .span-2 {
+      grid-column: span 2;
+    }
+
     .subtitle_styles {
       font-size: 1.2rem;
       font-weight: bold;
@@ -198,6 +202,44 @@ function init() {
       items_to_add.push(item);
     });
   }
+
+  const stock_item = document.createElement("div");
+  stock_item.classList.add("item_styles");
+  stock_item.classList.add("span-2");
+
+  const stock_title = document.createElement("h3");
+  stock_title.classList.add("subtitle_styles");
+  stock_title.innerHTML = "Voorraad onder threshold";
+  stock_item.appendChild(stock_title);
+
+  const stock_data = fetch(
+    "https://netjes.jorismertz.nl/api/get-stock-under-threshold"
+  ).then(async (response) => {
+    interface ResponseType {
+      productId: number;
+      variantId: number;
+      stock: number;
+    }
+    const data = (await response.json()) as ResponseType[];
+
+    data.forEach((item) => {
+      console.log(item);
+      const row = document.createElement("div");
+      row.classList.add("order_table_row_styles");
+      row.innerHTML = `
+      <p>
+        <a href="https://nettenshop.webshopapp.com/admin/products/${item.productId}/variants/${item.variantId}">
+          ${item.productId} - ${item.variantId}
+        </a>
+      </p>
+      <p>${item.stock}</p>
+      `;
+
+      stock_item.appendChild(row);
+    });
+
+    item_wrapper.appendChild(stock_item);
+  });
 }
 
 (() => {
