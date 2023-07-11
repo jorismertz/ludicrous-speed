@@ -78,6 +78,8 @@ function init() {
     }
 
     .order_table_row_styles {
+      display: flex;
+      justify-content: space-between;
     }
 
     .span-2 {
@@ -225,7 +227,6 @@ function init() {
             const data = (yield response.json());
             data.forEach((item) => {
                 const row = document.createElement("tr");
-                row.classList.add("order_table_row_styles");
                 row.innerHTML = `
       <td>${item.title}</td>
       <td><a href="https://nettenshop.webshopapp.com/admin/products/${item.productId}">${item.variantId}</a></td>
