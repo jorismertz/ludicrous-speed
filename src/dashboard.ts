@@ -50,8 +50,6 @@ async function getFilteredOrdersByCustomStatus(status: string) {
 }
 
 async function init() {
-  console.log("hi");
-
   const $ = (el: string) => document.querySelectorAll(el);
 
   const styles = `
@@ -118,7 +116,6 @@ async function init() {
   const dashboard_items = $(".container")[1];
 
   if (!dashboard_items) {
-    console.log("no dashboard items");
     return;
   }
 
@@ -126,14 +123,12 @@ async function init() {
   try {
     const has_already_run = dashboard_items.querySelector("has-run");
     if (has_already_run) {
-      console.log("already run");
       return;
     }
   } catch (e) {}
 
   const rerun_preventer = document.createElement("has-run");
   dashboard_items.appendChild(rerun_preventer);
-  console.log("running");
 
   // Delete last two rows containing graph and advertisements
   try {
@@ -256,7 +251,6 @@ async function init() {
     const data = (await response.json()) as ResponseType[];
 
     data.forEach((item) => {
-      console.log(item);
       const row = document.createElement("tr");
       row.classList.add("order_table_row_styles");
       row.innerHTML = `

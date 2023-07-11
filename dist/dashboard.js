@@ -50,7 +50,6 @@ function getFilteredOrdersByCustomStatus(status) {
 function init() {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("hi");
         const $ = (el) => document.querySelectorAll(el);
         const styles = `
     .item_styles {
@@ -112,20 +111,17 @@ function init() {
         document.head.appendChild(stylesElement);
         const dashboard_items = $(".container")[1];
         if (!dashboard_items) {
-            console.log("no dashboard items");
             return;
         }
         try {
             const has_already_run = dashboard_items.querySelector("has-run");
             if (has_already_run) {
-                console.log("already run");
                 return;
             }
         }
         catch (e) { }
         const rerun_preventer = document.createElement("has-run");
         dashboard_items.appendChild(rerun_preventer);
-        console.log("running");
         try {
             if (dashboard_items.childNodes.length > 3) {
                 const rowsToDelete = [
@@ -228,7 +224,6 @@ function init() {
         const stock_data = fetch("https://netjes.jorismertz.nl/api/get-stock-under-threshold").then((response) => __awaiter(this, void 0, void 0, function* () {
             const data = (yield response.json());
             data.forEach((item) => {
-                console.log(item);
                 const row = document.createElement("tr");
                 row.classList.add("order_table_row_styles");
                 row.innerHTML = `
