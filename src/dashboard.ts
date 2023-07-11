@@ -49,7 +49,9 @@ async function getFilteredOrdersByCustomStatus(status: string) {
   return result;
 }
 
-function init() {
+async function init() {
+  console.log("hi");
+
   const $ = (el: string) => document.querySelectorAll(el);
 
   const styles = `
@@ -70,14 +72,15 @@ function init() {
     }
 
     .order_table_styles {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+      display: table;
+      width: 100%;
+    }
+
+    .order_table_styles > thead > tr > th {
+      text-align: left;
     }
 
     .order_table_row_styles {
-      display: flex;
-      justify-content: space-between;
     }
 
     .span-2 {
@@ -100,6 +103,9 @@ function init() {
       .item_wrapper_styles {
         grid-template-columns: 1fr;
       }
+      .span-2 {
+        grid-column: span 1;
+      }
     }
 
   `;
@@ -109,17 +115,25 @@ function init() {
   stylesElement.innerHTML = styles;
   document.head.appendChild(stylesElement);
 
-  const dashboard_items = $(".container")[2];
-  if (!dashboard_items) return;
+  const dashboard_items = $(".container")[1];
+
+  if (!dashboard_items) {
+    console.log("no dashboard items");
+    return;
+  }
 
   // Prevent chrome extension from running this script twice on the same page load
   try {
     const has_already_run = dashboard_items.querySelector("has-run");
-    if (has_already_run) return;
+    if (has_already_run) {
+      console.log("already run");
+      return;
+    }
   } catch (e) {}
 
   const rerun_preventer = document.createElement("has-run");
   dashboard_items.appendChild(rerun_preventer);
+  console.log("running");
 
   // Delete last two rows containing graph and advertisements
   try {
@@ -145,6 +159,11 @@ function init() {
   item_wrapper.classList.add("item_wrapper_styles");
   dashboard_items.appendChild(item_wrapper);
 
+  const order_item_wrapper = document.createElement("div");
+  order_item_wrapper.classList.add("item_wrapper_styles");
+  order_item_wrapper.style.marginTop = "12px";
+  dashboard_items.appendChild(order_item_wrapper);
+
   const orderStatussesToDisplay = [
     "manco-bestelling-van-dijk",
     "spoedbestelling-jvd",
@@ -161,10 +180,10 @@ function init() {
 
   const items_to_add: HTMLDivElement[] = [];
 
-  for (const status of orderStatussesToDisplay) {
+  for await (const status of orderStatussesToDisplay) {
     const status_name = statusNameMap[orderStatussesToDisplay.indexOf(status)];
 
-    getFilteredOrdersByCustomStatus(status).then((orders) => {
+    getFilteredOrdersByCustomStatus(status).then(async (orders) => {
       const item = document.createElement("div");
       item.classList.add("item_styles");
 
@@ -212,10 +231,24 @@ function init() {
   stock_title.innerHTML = "Voorraad onder threshold";
   stock_item.appendChild(stock_title);
 
+  const stock_item_table = document.createElement("table");
+  stock_item_table.classList.add("order_table_styles");
+  stock_item_table.innerHTML = `<thead>
+    <tr>
+      <th>Product</th>
+      <th>Variant</th>
+      <th>Voorraad</th>
+    </thead>`;
+
+  const stock_item_table_body = document.createElement("tbody");
+  stock_item_table.appendChild(stock_item_table_body);
+  stock_item.appendChild(stock_item_table);
+
   const stock_data = fetch(
     "https://netjes.jorismertz.nl/api/get-stock-under-threshold"
   ).then(async (response) => {
     interface ResponseType {
+      title: number;
       productId: number;
       variantId: number;
       stock: number;
@@ -224,24 +257,21 @@ function init() {
 
     data.forEach((item) => {
       console.log(item);
-      const row = document.createElement("div");
+      const row = document.createElement("tr");
       row.classList.add("order_table_row_styles");
       row.innerHTML = `
-      <p>
-        <a href="https://nettenshop.webshopapp.com/admin/products/${item.productId}/variants/${item.variantId}">
-          ${item.productId} - ${item.variantId}
-        </a>
-      </p>
-      <p>${item.stock}</p>
+      <td>${item.title}</td>
+      <td><a href="https://nettenshop.webshopapp.com/admin/products/${item.productId}">${item.variantId}</a></td>
+      <td>${item.stock}</td>
       `;
 
-      stock_item.appendChild(row);
+      stock_item_table_body.appendChild(row);
     });
 
-    item_wrapper.appendChild(stock_item);
+    order_item_wrapper.appendChild(stock_item);
   });
 }
 
-(() => {
-  init();
+(async () => {
+  await init();
 })();
